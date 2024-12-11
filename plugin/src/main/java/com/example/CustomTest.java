@@ -14,7 +14,9 @@ import org.gradle.api.tasks.testing.TestOutputEvent;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.net.URI;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,20 +33,32 @@ public abstract class CustomTest extends DefaultTask {
     @Option(option="fail", description = "Tells the task to demonstrate failures.")
     public abstract Property<Boolean> getFail();
 
+    /**
+     * @return A property that adds some randomness to the test execution time.
+     */
     @Input
-    public abstract Property<Integer> getWobble();
+    protected abstract Property<Integer> getWobble();
 
+    /**
+     * @return A property that specifies the name of the test suite target.
+     */
     @Input
-    public abstract Property<String> getTestSuiteTargetName();
+    protected abstract Property<String> getTestSuiteTargetName();
 
-    @Inject
-    protected abstract TestEventReporterFactory getTestEventReporterFactory();
-
+    /**
+     * @return The directory where the binary test results are written.
+     */
     @OutputDirectory
     protected abstract DirectoryProperty getBinaryResultsDirectory();
 
+    /**
+     * @return The directory where the HTML test report is written.
+     */
     @OutputDirectory
     protected abstract DirectoryProperty getHtmlReportDirectory();
+
+    @Inject
+    protected abstract TestEventReporterFactory getTestEventReporterFactory();
 
     @TaskAction
     void runTests() throws IOException {
@@ -63,6 +77,7 @@ public abstract class CustomTest extends DefaultTask {
 
             String testSuiteTargetName = getTestSuiteTargetName().get();
 
+            // Demonstrate attaching metadata properties to a group of tests (the root here)
             Map<String, Object> metadata = new HashMap<>();
             metadata.put("testSuiteTargetName", testSuiteTargetName);
             metadata.put("wobble", getWobble().get());
@@ -70,43 +85,37 @@ public abstract class CustomTest extends DefaultTask {
             root.metadata(Instant.now(), metadata);
 
             // Demonstrate parallel execution
-            try (GroupTestEventReporter parallel = root.reportTestGroup("ParallelSuite")) {
-                parallel.started(Instant.now());
+            GroupTestEventReporter worker1 = root.reportTestGroup("ParallelSuite1");
+            GroupTestEventReporter worker2 = root.reportTestGroup("ParallelSuite2");
+            GroupTestEventReporter worker3 = root.reportTestGroup("ParallelSuite3");
 
-                GroupTestEventReporter worker1 = parallel.reportTestGroup("Worker 1");
-                GroupTestEventReporter worker2 = parallel.reportTestGroup("Worker 2");
-                GroupTestEventReporter worker3 = parallel.reportTestGroup("Worker 3");
+            try (worker1; worker2; worker3) {
+                worker1.started(Instant.now());
+                worker2.started(Instant.now());
+                worker3.started(Instant.now());
 
-                try (worker1; worker2; worker3) {
-                    worker1.started(Instant.now());
-                    worker2.started(Instant.now());
-                    worker3.started(Instant.now());
+                TestEventReporter test1 = worker1.reportTest("parallelTest1", "parallelTest1()");
+                TestEventReporter test2 = worker2.reportTest("parallelTest2", "parallelTest2()");
+                TestEventReporter test3 = worker2.reportTest("parallelTest3", "parallelTest3()");
 
-                    TestEventReporter test1 = worker1.reportTest("parallelTest1", "parallelTest1()");
-                    TestEventReporter test2 = worker2.reportTest("parallelTest2", "parallelTest2()");
-                    TestEventReporter test3 = worker2.reportTest("parallelTest3", "parallelTest3()");
+                try (test1; test2; test3) {
+                    test1.started(Instant.now());
+                    test2.started(Instant.now());
+                    test3.started(Instant.now());
 
-                    try (test1; test2; test3) {
-                        test1.started(Instant.now());
-                        test2.started(Instant.now());
-                        test3.started(Instant.now());
+                    // Simulate some activity
+                    simulateWork(250);
+                    test1.succeeded(Instant.now());
 
-                        // Simulate some activity
-                        simulateWork(250);
-                        test1.succeeded(Instant.now());
+                    simulateWork(500);
+                    test2.succeeded(Instant.now());
 
-                        simulateWork(500);
-                        test2.succeeded(Instant.now());
-
-                        simulateWork(100);
-                        test3.succeeded(Instant.now());
-                    }
-                    worker1.succeeded(Instant.now());
-                    worker2.succeeded(Instant.now());
-                    worker3.succeeded(Instant.now());
+                    simulateWork(100);
+                    test3.succeeded(Instant.now());
                 }
-
-                parallel.succeeded(Instant.now());
+                worker1.succeeded(Instant.now());
+                worker2.succeeded(Instant.now());
+                worker3.succeeded(Instant.now());
             }
 
             // If requested, demonstrate a failing test
@@ -117,9 +126,13 @@ public abstract class CustomTest extends DefaultTask {
                         test.started(Instant.now());
                         // Simulate some activity
                         simulateWork(300);
+
+                        // Demonstrate attaching metadata to a failing test
+                        test.metadata(Instant.now(), Collections.singletonMap("remoteService", URI.create("https://example.com")));
+
                         test.failed(Instant.now(), "This is a test failure");
                     }
-                    suite.failed(Instant.now(), "This is additional message for the suite failure");
+                    suite.succeeded(Instant.now());
                 }
             }
 
@@ -135,6 +148,9 @@ public abstract class CustomTest extends DefaultTask {
                     try (TestEventReporter test = suite.reportTest("test" + i, "test(" + i + ")")) {
                         // Start an individual test case
                         test.started(Instant.now());
+
+                        // Demonstrate attaching metadata to several tests
+                        test.metadata(Instant.now(), Collections.singletonMap("index", i));
 
                         // Simulate some activity
                         simulateWork(250);
@@ -182,27 +198,6 @@ public abstract class CustomTest extends DefaultTask {
                 }
                 // the suite needs to be completed after all tests
                 suite.succeeded(Instant.now());
-            }
-
-            // Demonstrate arbitrary nesting levels
-            try (GroupTestEventReporter outer = root.reportTestGroup("OuterNestingSuite")) {
-                outer.started(Instant.now());
-                // The parent-child relationship is expressed by creating the child with the parent's reportXXX method
-                try (GroupTestEventReporter deeper = outer.reportTestGroup("DeeperNestingSuite")) {
-                    deeper.started(Instant.now());
-                    try (GroupTestEventReporter inner = deeper.reportTestGroup("InnerNestingSuite")) {
-                        inner.started(Instant.now());
-                        try (TestEventReporter test = inner.reportTest("nestedTest", "nestedTest()")) {
-                            // This test is found at OuterNestingSuite > DeeperNestingSuite > InnerNestingSuite > nestedTest()
-                            test.started(Instant.now());
-                            simulateWork(100);
-                            test.succeeded(Instant.now());
-                        }
-                        inner.succeeded(Instant.now());
-                    }
-                    deeper.succeeded(Instant.now());
-                }
-                outer.succeeded(Instant.now());
             }
 
             if (getFail().get()) {

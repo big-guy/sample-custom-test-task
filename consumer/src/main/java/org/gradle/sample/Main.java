@@ -28,6 +28,7 @@ public class Main {
             launcher.setStandardOutput(System.out);
             launcher.setStandardError(System.err);
             launcher.addProgressListener(progressEvent -> {
+                // Test has just finished
                 if (progressEvent instanceof TestFinishEvent testFinishEvent) {
                     switch(testFinishEvent.getResult()) {
                         case TestFailureResult _ -> System.out.println(toEventPath(testFinishEvent.getDescriptor()) + " failed");
@@ -36,11 +37,11 @@ public class Main {
                         default -> System.out.println(toEventPath(testFinishEvent.getDescriptor()) + " finished with unknown result");
                     }
                 } else if (progressEvent instanceof TestMetadataEvent testMetadataEvent) {
+                    // NOTE: metadata is associated with a test operation through its parent:
+                    // progressEvent.getDescriptor().getParent() instanceof TestOperationDescriptor
                     System.out.println(toEventPath(testMetadataEvent.getDescriptor()) + " " + testMetadataEvent.getValues());
-                } else {
-                    System.out.println("What are you? " + progressEvent);
                 }
-            }, OperationType.TEST, OperationType.TEST_METADATA, OperationType.ROOT);
+            }, OperationType.TEST, OperationType.TEST_METADATA);
 
             // Run the build
             launcher.run();

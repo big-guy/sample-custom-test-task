@@ -1,0 +1,88 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.gradle",
+    "module": "gradle-tooling-api",
+    "version": "8.13",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.12-20241126002544+0000"
+    }
+  },
+  "variants": [
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "shadowed",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "gradle-tooling-api-8.13-sources.jar",
+          "url": "gradle-tooling-api-8.13-sources.jar",
+          "size": 6038360,
+          "sha512": "24f8131e91b83e4ac456b7933bf0337888b76a443b0105150dff294b4e475832342e38bd90b125485dcacd465dd06b72bd1ea1c4507ac47fec2435c8404a770e",
+          "sha256": "0b2ddb3b2744bbec8fe2ebd759777e35aabe96d463fe0be635488d2340d5a985",
+          "sha1": "7c3129bdfe887644b4653eb262e3030b28f1f23f",
+          "md5": "2ee99dcda0d879d47719f7490d012a3f"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "gradle-tooling-api-8.13-javadoc.jar",
+          "url": "gradle-tooling-api-8.13-javadoc.jar",
+          "size": 2069093,
+          "sha512": "279cbe104882861f926c898cb5e2836856a953e009cd7391f2575ae585cd06148d5ebdb4a972cb7ed076b22a42f8ff1b39155aea91768d441460f5429c9f2d6a",
+          "sha256": "97c9e72e13ee843b3cbd1280172f0aaec52e1792d4d18ef64b38da48a564dee8",
+          "sha1": "badd0f021d13588491fdcd875e320c41449e2f77",
+          "md5": "bd931fa9b513b949aaea6b196315e833"
+        }
+      ]
+    },
+    {
+      "name": "shadedRuntimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "shadowed",
+        "org.gradle.jvm.version": 6,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-api",
+          "version": {
+            "requires": "1.7.36"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "gradle-tooling-api-8.13.jar",
+          "url": "gradle-tooling-api-8.13.jar",
+          "size": 3102282,
+          "sha512": "8519e07a279a68d7e886cfa028e54fc235ff7455cdf85708b4eb01b518816d8f138f38d2367a0a49db7006779fe75c7dba103e00a7863218bf527ee4973ac0ea",
+          "sha256": "e3dae68d1e314cf84b3e083af38c6698cdbba4e0676f41a9ac2b699c9c7c8ec0",
+          "sha1": "450d05090312d1decc54886d585fcf150a693689",
+          "md5": "3e8de723d17b9946fe80008204a2732d"
+        }
+      ]
+    }
+  ]
+}

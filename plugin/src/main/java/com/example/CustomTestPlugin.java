@@ -3,7 +3,6 @@ package com.example;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.reporting.ReportingExtension;
-import org.gradle.api.specs.Specs;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.testing.base.TestingExtension;
 
@@ -24,11 +23,12 @@ public abstract class CustomTestPlugin implements Plugin<Project> {
 
         ReportingExtension reporting = project.getExtensions().getByType(ReportingExtension.class);
 
-        // The built-in custom test suite has two targets
+        // Register a couple of built-in test suite with two targets each
         testing.getSuites().register("passing", CustomTestSuite.class, suite -> {
             suite.getTargets().register("debug");
             suite.getTargets().register("release");
             suite.getTargets().configureEach(target -> {
+                // The passing test suite always passes
                 target.getDemonstrateFailure().convention(false);
             });
         });
@@ -36,36 +36,36 @@ public abstract class CustomTestPlugin implements Plugin<Project> {
             suite.getTargets().register("debug");
             suite.getTargets().register("release");
             suite.getTargets().configureEach(target -> {
+                // The failing test suite always fails
                 target.getDemonstrateFailure().convention(true);
             });
         });
 
         Random random = new Random();
+        // For every custom test suite
         testing.getSuites().withType(CustomTestSuite.class).all(suite -> {
+            // For every target in the suite
             suite.getTargets().withType(CustomTestSuiteTarget.class).all(target -> {
-                // Register a test for every target
+                // Register a task
                 String taskName = "test" + capitalize(suite.getName()) + capitalize(target.getName());
                 TaskProvider<CustomTest> customTest = project.getTasks().register(taskName, CustomTest.class, task -> {
+                    task.getTestSuiteTargetName().convention(capitalize(target.getName()));
                     task.getFail().convention(target.getDemonstrateFailure());
 
                     task.setGroup("verification");
                     task.setDescription("Runs the tests for " + target.getName());
 
+                    // Configure where the results go
                     task.getBinaryResultsDirectory().convention(project.getLayout().getBuildDirectory().dir("test-results/" + task.getName()));
                     task.getHtmlReportDirectory().convention(reporting.getBaseDirectory().dir("tests/" + task.getName()));
 
                     // Enables Test UI in IntelliJ
                     task.getExtensions().getExtraProperties().set("idea.internal.test", true);
-
                     // Generate slightly different times to make the results look interesting
                     task.getWobble().convention(random.nextInt(-50, 50));
-                    task.getTestSuiteTargetName().convention(capitalize(target.getName()));
-
-                    // Always consider the task out-of-date
-                    task.getOutputs().upToDateWhen(Specs.satisfyNone());
                 });
 
-                // This is an output of the task
+                // Attach the output of the task back to the test suite target
                 target.getBinaryResultsDirectory().convention(customTest.flatMap(CustomTest::getBinaryResultsDirectory));
                 target.getHtmlReportDirectory().convention(customTest.flatMap(CustomTest::getHtmlReportDirectory));
             });
