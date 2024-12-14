@@ -84,7 +84,7 @@ public abstract class CustomTest extends DefaultTask {
             Map<String, Object> metadata = new HashMap<>();
             metadata.put("testSuiteTargetName", testSuiteTargetName);
             metadata.put("wobble", getWobble().get());
-            metadata.put("fail?", getFail().get());
+            metadata.put("fail?", String.valueOf(getFail().get()));
             root.metadata(Instant.now(), metadata);
             root.metadata(Instant.now(), Map.of(
                     "Day of Week", LocalDate.now().get(ChronoField.DAY_OF_WEEK),
@@ -141,7 +141,7 @@ public abstract class CustomTest extends DefaultTask {
 
                         test.failed(Instant.now(), "This is a test failure");
                     }
-                    suite.succeeded(Instant.now());
+                    suite.failed(Instant.now());
                 }
             }
 
@@ -155,7 +155,7 @@ public abstract class CustomTest extends DefaultTask {
                 suite.metadata(Instant.now(), Map.of(
                         "OS name", System.getProperty("os.name"),
                         "OS architecture", System.getProperty("os.arch"),
-                        "OS name", System.getProperty("os.name")
+                        "OS version", System.getProperty("os.version")
                 ));
                 suite.metadata(Instant.now(), Collections.singletonMap("Processor Count", Runtime.getRuntime().availableProcessors()));
                 suite.metadata(Instant.now(), Map.of(
