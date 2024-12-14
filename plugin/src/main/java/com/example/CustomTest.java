@@ -1,6 +1,5 @@
 package com.example;
 
-import org.apache.groovy.util.Maps;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Property;
@@ -153,13 +152,13 @@ public abstract class CustomTest extends DefaultTask {
                 suite.started(Instant.now());
 
                 // Add some environment metadata
-                suite.metadata(Instant.now(), Maps.of(
+                suite.metadata(Instant.now(), Map.of(
                         "OS name", System.getProperty("os.name"),
                         "OS architecture", System.getProperty("os.arch"),
                         "OS name", System.getProperty("os.name")
                 ));
                 suite.metadata(Instant.now(), Collections.singletonMap("Processor Count", Runtime.getRuntime().availableProcessors()));
-                suite.metadata(Instant.now(), Maps.of(
+                suite.metadata(Instant.now(), Map.of(
                         "Free Memory", Runtime.getRuntime().freeMemory(),
                         "Max Memory", Runtime.getRuntime().maxMemory(),
                         "Total Memory", Runtime.getRuntime().totalMemory()
