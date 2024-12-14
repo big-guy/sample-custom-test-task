@@ -31,9 +31,9 @@ public class Main {
                 // Test has just finished
                 if (progressEvent instanceof TestFinishEvent testFinishEvent) {
                     switch(testFinishEvent.getResult()) {
-                        case TestFailureResult _ -> System.out.println(toEventPath(testFinishEvent.getDescriptor()) + " failed");
-                        case TestSkippedResult _ -> System.out.println(toEventPath(testFinishEvent.getDescriptor()) + " skipped");
-                        case TestSuccessResult _ -> System.out.println(toEventPath(testFinishEvent.getDescriptor()) + " succeeded");
+                        case TestFailureResult x -> System.out.println(toEventPath(testFinishEvent.getDescriptor()) + " failed");
+                        case TestSkippedResult x -> System.out.println(toEventPath(testFinishEvent.getDescriptor()) + " skipped");
+                        case TestSuccessResult x -> System.out.println(toEventPath(testFinishEvent.getDescriptor()) + " succeeded");
                         default -> System.out.println(toEventPath(testFinishEvent.getDescriptor()) + " finished with unknown result");
                     }
                 } else if (progressEvent instanceof TestMetadataEvent testMetadataEvent) {
