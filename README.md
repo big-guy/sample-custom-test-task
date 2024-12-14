@@ -35,6 +35,12 @@ Two types of events are captured:
 The `TestMetadataEvent` includes custom metadata added by the task. These can be emitted any time between the start and end of a test or group of tests.
 The custom metadata is represented by a map of key-value pairs (`String` to `Object`). Only serializable values are supported.
 
+### Metadata Reporting
+
+Metadata of various types is recorded during test execution and is available in the test reports located in `build/reports/tests`.
+There are various types of metadata associated with at the root level, the test suite level and the individual test level.  Known types can be rendered with custom styles in the HTML report; for example, URI metadata is rendered as clickable links.
+Running the failing tests, clicking the generated link, and investigating `MyTestSuite` is the easiest way to see this in action.
+
 ### Final notes
 
 If this sample is imported into IntelliJ, the IDE will automatically show the test UI pane when running the `testPassingDebug`, `testFailingDebug`, `testPassingRelease` and `testFailingRelease` tasks. Custom test tasks are not automatically supported in the IDE yet, so this is accomplished by setting an internal flag on the custom tasks.

@@ -1,5 +1,6 @@
 package com.example;
 
+import org.apache.groovy.util.Maps;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Property;
@@ -13,9 +14,11 @@ import org.gradle.api.tasks.testing.TestEventReporterFactory;
 import org.gradle.api.tasks.testing.TestOutputEvent;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoField;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +26,7 @@ import java.util.Map;
 /**
  * A custom task that demonstrates the {@code TestEventReporter} API.
  */
+@SuppressWarnings("UnstableApiUsage")
 public abstract class CustomTest extends DefaultTask {
     /**
      * CLI option to always generate a test failure when demonstrating the {@code TestEventReporter} API.
@@ -61,7 +65,7 @@ public abstract class CustomTest extends DefaultTask {
     protected abstract TestEventReporterFactory getTestEventReporterFactory();
 
     @TaskAction
-    void runTests() throws IOException {
+    void runTests() throws URISyntaxException {
         // This task is a demonstration of generating the proper test events.
         // It simulates a variety of conditions and nesting levels
 
@@ -83,6 +87,12 @@ public abstract class CustomTest extends DefaultTask {
             metadata.put("wobble", getWobble().get());
             metadata.put("fail?", getFail().get());
             root.metadata(Instant.now(), metadata);
+            root.metadata(Instant.now(), Map.of(
+                    "Day of Week", LocalDate.now().get(ChronoField.DAY_OF_WEEK),
+                    "Day of Month", LocalDate.now().get(ChronoField.DAY_OF_MONTH),
+                    "Day of Year", LocalDate.now().get(ChronoField.DAY_OF_YEAR)
+            ));
+            root.metadata(Instant.now(), Collections.singletonMap("Gradle Docs", URI.create("https://docs.gradle.org")));
 
             // Demonstrate parallel execution
             GroupTestEventReporter worker1 = root.reportTestGroup("ParallelSuite1");
@@ -128,7 +138,7 @@ public abstract class CustomTest extends DefaultTask {
                         simulateWork(300);
 
                         // Demonstrate attaching metadata to a failing test
-                        test.metadata(Instant.now(), Collections.singletonMap("remoteService", URI.create("https://example.com")));
+                        test.metadata(Instant.now(), Collections.singletonMap("Remote Service", URI.create("https://example.com")));
 
                         test.failed(Instant.now(), "This is a test failure");
                     }
@@ -142,6 +152,22 @@ public abstract class CustomTest extends DefaultTask {
                 // Start a group of test cases
                 suite.started(Instant.now());
 
+                // Add some environment metadata
+                suite.metadata(Instant.now(), Maps.of(
+                        "OS name", System.getProperty("os.name"),
+                        "OS architecture", System.getProperty("os.arch"),
+                        "OS name", System.getProperty("os.name")
+                ));
+                suite.metadata(Instant.now(), Collections.singletonMap("Processor Count", Runtime.getRuntime().availableProcessors()));
+                suite.metadata(Instant.now(), Maps.of(
+                        "Free Memory", Runtime.getRuntime().freeMemory(),
+                        "Max Memory", Runtime.getRuntime().maxMemory(),
+                        "Total Memory", Runtime.getRuntime().totalMemory()
+                ));
+
+                // Demonstrate attaching metadata of a type we don't know how to render
+                suite.metadata(Instant.now(), Collections.singletonMap("Error Data", new Throwable("This is a throwable")));
+
                 // Simulate 10 tests running
                 for (int i=0; i<10; i++) {
 
@@ -150,7 +176,9 @@ public abstract class CustomTest extends DefaultTask {
                         test.started(Instant.now());
 
                         // Demonstrate attaching metadata to several tests
+                        test.metadata(Instant.now(), "Suite Name", "MyTestSuite");
                         test.metadata(Instant.now(), Collections.singletonMap("index", i));
+                        test.metadata(Instant.now(), Collections.singletonMap("Test Source Jar", this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()));
 
                         // Simulate some activity
                         simulateWork(250);
