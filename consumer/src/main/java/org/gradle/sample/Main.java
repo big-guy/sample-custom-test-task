@@ -24,7 +24,7 @@ public class Main {
         try {
             // Configure the build
             BuildLauncher launcher = connection.newBuild();
-            launcher.forTasks("testPassingDebug", "testFailingDebug");
+            launcher.forTasks(":application:testPassingDebug", ":application:testFailingDebug");
             launcher.setStandardOutput(System.out);
             launcher.setStandardError(System.err);
             launcher.addProgressListener(progressEvent -> {

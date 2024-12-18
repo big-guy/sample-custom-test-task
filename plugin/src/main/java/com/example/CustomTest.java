@@ -72,7 +72,7 @@ public abstract class CustomTest extends DefaultTask {
         // You can manually call close() on a reporter. Once closed or completed, a test/group cannot generate
         // more events
         try (GroupTestEventReporter root = getTestEventReporterFactory().createTestEventReporter(
-            getName(),
+            getPath(),
             getBinaryResultsDirectory().get(),
             getHtmlReportDirectory().get()
         )) {

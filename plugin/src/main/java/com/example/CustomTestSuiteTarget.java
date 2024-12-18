@@ -19,6 +19,7 @@ public interface CustomTestSuiteTarget extends TestSuiteTarget, Named {
      *
      * @return The directory where the binary test results are written.
      */
+    @Override
     DirectoryProperty getBinaryResultsDirectory();
 
     /**
