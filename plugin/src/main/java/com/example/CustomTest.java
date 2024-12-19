@@ -1,9 +1,11 @@
 package com.example;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
@@ -13,6 +15,7 @@ import org.gradle.api.tasks.testing.TestEventReporterFactory;
 import org.gradle.api.tasks.testing.TestOutputEvent;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -21,6 +24,7 @@ import java.time.temporal.ChronoField;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A custom task that demonstrates the {@code TestEventReporter} API.
@@ -60,6 +64,12 @@ public abstract class CustomTest extends DefaultTask {
     @OutputDirectory
     protected abstract DirectoryProperty getHtmlReportDirectory();
 
+    /**
+     * @return The "runtime classpath" of this test execution
+     */
+    @InputFiles
+    protected abstract ConfigurableFileCollection getClasspath();
+
     @Inject
     protected abstract TestEventReporterFactory getTestEventReporterFactory();
 
@@ -92,6 +102,7 @@ public abstract class CustomTest extends DefaultTask {
                     "Day of Year", LocalDate.now().get(ChronoField.DAY_OF_YEAR)
             ));
             root.metadata(Instant.now(), Collections.singletonMap("Gradle Docs", URI.create("https://docs.gradle.org")));
+            root.metadata(Instant.now(), Collections.singletonMap("Classpath", getClasspath().getFiles().stream().map(File::getName).collect(Collectors.joining(", "))));
 
             // Demonstrate parallel execution
             GroupTestEventReporter worker1 = root.reportTestGroup("ParallelSuite1");

@@ -1,6 +1,7 @@
 package com.example;
 
 import org.gradle.api.Named;
+import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.testing.base.TestSuiteTarget;
@@ -13,6 +14,11 @@ public interface CustomTestSuiteTarget extends TestSuiteTarget, Named {
      * For demonstration purposes, this property can be set to {@code true} to always generate a test failure.
      */
     Property<Boolean> getDemonstrateFailure();
+
+    /**
+     * The classpath for the test suite target.
+     */
+    ConfigurableFileCollection getClasspath();
 
     /**
      * This allows another task or domain object to depend on the binary results of this test suite target.

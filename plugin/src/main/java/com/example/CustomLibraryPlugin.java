@@ -8,6 +8,7 @@ import org.gradle.api.artifacts.DependencyScopeConfiguration;
 import org.gradle.api.attributes.Category;
 import org.gradle.api.attributes.Usage;
 import org.gradle.api.model.ObjectFactory;
+import org.gradle.api.tasks.TaskProvider;
 
 import javax.inject.Inject;
 
@@ -23,6 +24,12 @@ public abstract class CustomLibraryPlugin implements Plugin<Project> {
         project.getPluginManager().apply("com.example.custom-ecosystem");
 
         CustomLibrary library = project.getExtensions().create("library", CustomLibrary.class);
+        TaskProvider<CustomBuild> buildLibrary = project.getTasks().register("buildLibrary", CustomBuild.class, task -> {
+            task.getType().convention("library");
+            task.getContents().convention("building the library for " + project.getPath());
+            task.getOutputFile().convention(project.getLayout().getBuildDirectory().file("library"));
+        });
+        library.getMainOutput().convention(buildLibrary.flatMap(CustomBuild::getOutputFile));
 
         // This is where dependencies are declared
         NamedDomainObjectProvider<DependencyScopeConfiguration> implementation = project.getConfigurations().dependencyScope("implementation", configuration -> {
@@ -35,6 +42,9 @@ public abstract class CustomLibraryPlugin implements Plugin<Project> {
             configuration.attributes(attributes -> {
                 attributes.attribute(Category.CATEGORY_ATTRIBUTE, getObjectFactory().named(Category.class, Category.LIBRARY));
                 attributes.attribute(Usage.USAGE_ATTRIBUTE, getObjectFactory().named(Usage.class, "runtime"));
+            });
+            configuration.outgoing(outgoing -> {
+                outgoing.artifact(library.getMainOutput());
             });
         });
     }
