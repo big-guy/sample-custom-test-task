@@ -1,6 +1,5 @@
 plugins {
     id("org.gradle.test-report-aggregation")
-    id("com.example.custom-ecosystem")
 }
 
 description = "Dedicated project to aggregate test results from a list of projects"

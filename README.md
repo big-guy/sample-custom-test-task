@@ -41,6 +41,23 @@ Metadata of various types is recorded during test execution and is available in 
 There are various types of metadata associated with at the root level, the test suite level and the individual test level.  Known types can be rendered with custom styles in the HTML report; for example, URI metadata is rendered as clickable links.
 Running the failing tests, clicking the generated link, and investigating `MyTestSuite` is the easiest way to see this in action.
 
+### Custom test suites
+
+The custom-test plugin shows a simple "custom" ecosystem that uses test suites with multiple test suite targets and a custom test task.
+
+For demonstration purposes, it also includes a custom application and custom library as stand-ins for Android applications and Android libraries.
+
+### Test aggregation
+
+The test aggregation plugin has been updated to support non-JVM test suites and their targets.
+
+When applied to a project with an application, the aggregation plugin will attempt to aggregate test results for each test suite from all projects that the current project depends on.
+This is determined by looking at the runtimeElements of the current project and following its dependencies and selecting the test results from like-named test suites in other projects.
+You can see this in `application/build.gradle.kts`.
+
+When applied to a subproject on its own, you need to explicitly list the projects you want to have aggregated and create aggregate reports manually.
+You can see this in `aggregation/build.gradle.kts`.
+
 ### Final notes
 
 If this sample is imported into IntelliJ, the IDE will automatically show the test UI pane when running the `testPassingDebug`, `testFailingDebug`, `testPassingRelease` and `testFailingRelease` tasks. Custom test tasks are not automatically supported in the IDE yet, so this is accomplished by setting an internal flag on the custom tasks.
