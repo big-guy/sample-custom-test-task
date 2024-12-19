@@ -3,10 +3,18 @@ The plugin is packaged via an included build.
 
 This sample is intended to demonstrate how a platform provider, like Android or Kotlin Multiplatform, would use a low-level API to generate test events.
 
-This sample contains two parts:
+This sample contains multiple parts.
 
-* The `custom-test-task` plugin, which defines a custom task that generates test events.
+Demonstrating custom test tasks using the Gradle Tooling API and the new test event reporter API:
+
+* The `custom-test` plugin, which defines a custom task that generates test events.
 * The `consumer` build, which creates a Tooling API client to receive the test events.
+
+Demonstrating test report aggregation across projects:
+
+* The `application` build, which represents an application written in an example "custom" ecosystem.
+* The `library` build, which simulates an dependency of the application in the "custom" ecosystem.
+* The `aggregation` build, which demonstrates custom test report aggregration across projects.
 
 NOTE: The `consumer` requires Java 21.
 
