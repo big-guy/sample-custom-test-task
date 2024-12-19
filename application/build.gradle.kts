@@ -1,11 +1,14 @@
 plugins {
+    id("com.example.custom-application")
     id("com.example.custom-test")
+    // Aggregation plugin will aggregate all test results from projects this project depends on
     id("org.gradle.test-report-aggregation")
-    id("java")
 }
 
-version = "1.0.2"
+description = "An application project in the 'custom' ecosystem"
 
-dependencies {
-    implementation(project(":library"))
+application {
+    dependencies {
+        implementation(project(":library"))
+    }
 }

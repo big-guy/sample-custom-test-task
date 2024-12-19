@@ -1,6 +1,12 @@
 plugins {
     id("com.example.custom-test")
-    id("java")
+    id("com.example.custom-library")
 }
 
-version = "1.0.2"
+description = "A library project in the 'custom' ecosystem"
+
+library {
+    dependencies {
+        // none
+    }
+}
